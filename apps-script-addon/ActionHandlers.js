@@ -74,6 +74,7 @@ function executeDeepCheck(e) {
       .setNotification(CardService.newNotification().setText("Deep Scan: Service timeout."))
       .build();
   }
+  //next step is to add here more tests 
 }
 
 /**

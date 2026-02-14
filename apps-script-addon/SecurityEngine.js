@@ -3,12 +3,13 @@ function calculateRiskScore(context, message) {
   var reasons = [];
   var weights = SECURITY_CONFIG.WEIGHTS;
 
-  // 1. STATEFUL BLACKLIST CHECK
+  // 1. BLACKLIST CHECK
   if (DataStore.isBlacklisted(context.sender)) {
     return { score: 100, reasons: ["🛑 **User Blacklist**: You have manually blocked this sender."] };
   }
 
   // 2. GLOBAL THREAT INTELLIGENCE (Blocklist by domain)
+  //currently hardcoded- next step is checking with known global
   if (SECURITY_CONFIG.GLOBAL_BLOCKLIST.some(function(blocked) {
     return context.domain === blocked || context.domain.endsWith("." + blocked);
   })) {
@@ -17,6 +18,7 @@ function calculateRiskScore(context, message) {
   }
 
   // 3. IDENTITY SPOOFING (Watched Brands)
+  //checks that the name matches the email 
   SECURITY_CONFIG.WATCHED_BRANDS.forEach(function(brand) {
     if (context.displayName.toLowerCase().indexOf(brand) !== -1 && context.sender.indexOf(brand) === -1) {
       score += weights.IDENTITY_SPOOFING;
@@ -25,12 +27,14 @@ function calculateRiskScore(context, message) {
   });
 
   // 4. SMART WHITELIST (Trust but Verify)
+  //checks if it manully whitelisted and than reduced the risk score 
   if (DataStore.getWhitelist().toLowerCase().indexOf(context.domain) !== -1) {
     score -= 30;
     reasons.push("✅ **Policy Trust**: This domain is on your organization's whitelist.");
   }
 
   // 5. BEHAVIORAL REPUTATION
+  //checks for history 
   var history = DataStore.getReputation(context.sender);
   if (history.avgScore > 80) {
     score += 100;
@@ -43,12 +47,13 @@ function calculateRiskScore(context, message) {
     reasons.push("🔍 **First Encounter**: You have never received mail from this address before.");
   }
 
-  // 6. STATIC HEURISTICS (Attachments & Language)
+  // 6. STATIC HEURISTICS (Attachments & Language) 
+  // checks if contains exe files 
   if (context.attachments.some(f => f.getName().toLowerCase().match(/\.(exe|js|vbs)$/))) {
     score += weights.CRITICAL_ATTACHMENT;
     reasons.push("🛑 **Dangerous File**: Attachment contains a potentially malicious script or executable.");
   }
-
+//checks for commen words that use pressure for phishing 
   var urgencyWords = ["urgent", "action", "verify", "suspended", "password"];
   if (urgencyWords.some(word => context.subject.toLowerCase().indexOf(word) !== -1)) {
     score += weights.URGENCY_KEYWORDS;
