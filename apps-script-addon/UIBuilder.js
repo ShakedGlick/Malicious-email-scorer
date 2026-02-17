@@ -178,5 +178,3 @@ function buildHomepage(e) {
 
   return card.addSection(settingsSection).addSection(whitelistSection).build();
 }
-
-

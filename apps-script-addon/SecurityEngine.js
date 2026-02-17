@@ -49,7 +49,8 @@ function calculateRiskScore(context, message) {
 
   // 6. STATIC HEURISTICS (Attachments & Language) 
   // checks if contains exe files 
-  if (context.attachments.some(f => f.getName().toLowerCase().match(/\.(exe|js|vbs)$/))) {
+  // added pdf just for demo 
+  if (context.attachments.some(f => f.getName().toLowerCase().match(/\.(exe|js|vbs|pdf)$/))) {
     score += weights.CRITICAL_ATTACHMENT;
     reasons.push("🛑 **Dangerous File**: Attachment contains a potentially malicious script or executable.");
   }
@@ -65,3 +66,5 @@ function calculateRiskScore(context, message) {
     reasons: reasons.length ? reasons : ["✅ No immediate red flags detected."]
   };
 }
+
+  
