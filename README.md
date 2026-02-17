@@ -1,5 +1,4 @@
-ReadMe: Malicious Email Score: Shaked Glickstein 
-Project overview: 
+
 This project implements a Gmail Add-on that analyzes opened emails and evaluates the likelihood that they are malicious or phishing attempts.
 The system uses a rule-based security engine combined with behavioral state tracking. The next step would be to integrate machine learning to it. 
 The goal was to simulate how a security product reasons about risk: combining static indicators (attachments, spoofing, urgency language) with dynamic signals (user feedback and sender history).
